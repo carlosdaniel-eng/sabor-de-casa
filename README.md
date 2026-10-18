@@ -5,7 +5,7 @@ Trabalho da disciplina **N695 - Desenvolvimento de Plataformas Web** (Unifor), c
 A marmitaria Sabor de Casa mandava o cardápio como foto de um quadro escrito à mão, e a foto antiga continuava circulando depois que um prato acabava ou mudava de preço. Este sistema mantém o cardápio organizado em **categorias** e **pratos**, sempre atualizado.
 
 - **Aplicação:** _link da Vercel aqui_
-- **API:** _link do Render aqui_
+- **API:** mesmo link, em `/api` (ex.: `/api/categorias`)
 
 ## Stack
 
@@ -14,7 +14,7 @@ A marmitaria Sabor de Casa mandava o cardápio como foto de um quadro escrito à
 | Interface | React 19 + Vite, React Router, Axios, Bootstrap 5 |
 | Serviço Web | Node.js + Express 5 (API REST em JSON) |
 | Banco de dados | PostgreSQL (Supabase), acessado com a biblioteca `pg` |
-| Hospedagem | Vercel (frontend) e Render (API) |
+| Hospedagem | Vercel: o site é servido como arquivos estáticos e a API roda como função serverless em `/api` |
 
 ## Estrutura
 
@@ -30,6 +30,8 @@ sabor-de-casa/
 │       ├── database/       # conexão e criação das tabelas
 │       ├── middlewares/    # tratamento de erros e rota 404
 │       └── errors/         # classe AppError
+├── api/
+│   └── index.js        # entrada da API na Vercel (repassa /api/* para o app Express)
 └── frontend/
     └── src/
         ├── pages/          # telas
@@ -85,7 +87,17 @@ npm install
 npm run dev             # http://localhost:3000
 ```
 
-As tabelas são criadas automaticamente quando a API sobe (`backend/src/database/schema.sql`).
+Se o banco estiver vazio, as tabelas são criadas quando a API sobe (`backend/src/database/schema.sql`).
+
+## Publicação
+
+O projeto inteiro fica em um único projeto da Vercel, configurado pelo `vercel.json` da raiz:
+
+- o build gera o frontend em `frontend/dist`;
+- `api/index.js` vira uma função serverless que atende tudo que começa com `/api`;
+- em produção o frontend chama `/api` (arquivo `frontend/.env.production`), então não precisa de CORS.
+
+Variáveis de ambiente na Vercel: `DATABASE_URL` (connection string do Session pooler do Supabase) e `DB_SSL=true`.
 
 ## Equipe
 
