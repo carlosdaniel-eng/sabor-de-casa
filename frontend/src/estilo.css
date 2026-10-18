@@ -1,0 +1,49 @@
+:root {
+  --cor-principal: #c0562b;
+  --cor-principal-escura: #9c4220;
+  --cor-destaque: #e9a23b;
+  --cor-fundo: #fdf8f3;
+}
+
+body {
+  background-color: var(--cor-fundo);
+}
+
+.cabecalho {
+  background-color: var(--cor-principal);
+  border-bottom: 4px solid var(--cor-destaque);
+}
+
+.cabecalho .navbar-brand img {
+  width: 32px;
+  margin-right: 8px;
+}
+
+.btn-principal {
+  background-color: var(--cor-principal);
+  border-color: var(--cor-principal);
+  color: #fff;
+}
+
+.btn-principal:hover,
+.btn-principal:focus {
+  background-color: var(--cor-principal-escura);
+  border-color: var(--cor-principal-escura);
+  color: #fff;
+}
+
+.cartao {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+}
+
+.tabela-acoes {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.prato-indisponivel td {
+  color: #999;
+}
