@@ -4,8 +4,8 @@ Trabalho da disciplina **N695 - Desenvolvimento de Plataformas Web** (Unifor), c
 
 A marmitaria Sabor de Casa mandava o cardápio como foto de um quadro escrito à mão, e a foto antiga continuava circulando depois que um prato acabava ou mudava de preço. Este sistema mantém o cardápio organizado em **categorias** e **pratos**, sempre atualizado.
 
-- **Aplicação:** _link da Vercel aqui_
-- **API:** mesmo link, em `/api` (ex.: `/api/categorias`)
+- **Aplicação:** https://frontend-eight-lyart-82.vercel.app
+- **API:** mesmo link, em `/api` (ex.: https://frontend-eight-lyart-82.vercel.app/api/categorias)
 
 ## Stack
 
