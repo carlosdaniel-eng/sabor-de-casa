@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS pratos (
   criado_em TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- No Supabase as tabelas do schema public ficam expostas pela API pública deles.
--- Com RLS ligado e sem nenhuma policy, só a nossa API (que conecta como dona das tabelas) acessa.
+-- Ativa RLS para restringir o acesso direto pela API pública do Supabase
 ALTER TABLE categorias ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pratos ENABLE ROW LEVEL SECURITY;

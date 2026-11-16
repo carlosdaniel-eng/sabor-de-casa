@@ -1,107 +1,110 @@
-# Sabor de Casa: cardápio digital
+# Sabor de Casa — Cardápio Digital
 
-Trabalho da disciplina **N695 - Desenvolvimento de Plataformas Web** (Unifor), cenário 3: marmitaria com cardápio digital.
+Trabalho final da disciplina **N695 - Desenvolvimento de Plataformas Web** (Universidade de Fortaleza — Unifor).
 
-A marmitaria Sabor de Casa mandava o cardápio como foto de um quadro escrito à mão, e a foto antiga continuava circulando depois que um prato acabava ou mudava de preço. Este sistema mantém o cardápio organizado em **categorias** e **pratos**, sempre atualizado.
+- **Aluno:** Carlos Daniel Albino Alves — **Matrícula:** 2523582
+- **Cenário escolhido:** Cenário 3 — Marmitaria com cardápio digital (*Sabor de Casa*)
+- **Aplicação publicada:** https://frontend-eight-lyart-82.vercel.app
+- **API REST publicada:** https://frontend-eight-lyart-82.vercel.app/api/categorias
 
-- **Aplicação:** https://frontend-eight-lyart-82.vercel.app
-- **API:** mesmo link, em `/api` (ex.: https://frontend-eight-lyart-82.vercel.app/api/categorias)
+---
 
-## Stack
+## Sobre o problema e a solução
 
-| Parte | Tecnologias |
-| --- | --- |
-| Interface | React 19 + Vite, React Router, Axios, Bootstrap 5 |
-| Serviço Web | Node.js + Express 5 (API REST em JSON) |
-| Banco de dados | PostgreSQL (Supabase), acessado com a biblioteca `pg` |
-| Hospedagem | Vercel: o site é servido como arquivos estáticos e a API roda como função serverless em `/api` |
+A marmitaria **Sabor de Casa** recebia pedidos por aplicativo de mensagens e divulgava o cardápio enviando a foto de um quadro escrito à mão. Sempre que um prato acabava durante o almoço ou sofria reajuste de preço, a foto antiga continuava circulando entre os clientes e gerava pedidos incorretos.
 
-## Estrutura
+Para resolver esse problema, foi desenvolvida uma plataforma Web completa dividida em duas entidades relacionadas (**Categoria** e **Prato**, em relação `1:N`). No sistema, a proprietária gerencia as seções do cardápio (como *Executivos do Dia*, *Linha Fitness* e *Especiais Regionais*) e controla cada prato vinculado, podendo atualizar preços na hora ou marcar um item como *Esgotado* sem precisar apagar o cadastro.
 
-```
+---
+
+## Tecnologias utilizadas
+
+| Camada | Tecnologias | Percursos |
+| --- | --- | --- |
+| **Interface (Frontend)** | HTML5, CSS3, Bootstrap 5, React 19, Vite, React Router DOM 7 e Axios | Percursos 1, 2 e 3 |
+| **Serviço Web (Backend)** | Node.js, Express 5, arquitetura em camadas (`routes`, `controllers`, `services`, `repositories`, `validators`) | Percursos 3 e 4 |
+| **Persistência de dados** | PostgreSQL (hospedado no Supabase), acessado via pool de conexões da biblioteca `pg` | Percurso 4 |
+| **Hospedagem e Deploy** | Vercel (SPA estática integrada à API Express em `/api`) e GitHub | Percursos 1 a 4 |
+
+---
+
+## Organização do projeto
+
+```text
 sabor-de-casa/
 ├── backend/
 │   └── src/
-│       ├── routes/         # URLs da API
-│       ├── controllers/    # recebe a requisição e devolve a resposta HTTP
-│       ├── services/       # regras de negócio (nome único, não excluir com pratos...)
-│       ├── validators/     # validação dos dados de entrada
-│       ├── repositories/   # SQL, único lugar que fala com o banco
-│       ├── database/       # conexão e criação das tabelas
-│       ├── middlewares/    # tratamento de erros e rota 404
-│       └── errors/         # classe AppError
+│       ├── routes/         # Definição das rotas HTTP de categorias e pratos
+│       ├── controllers/    # Recebimento das requisições e retorno dos status HTTP
+│       ├── services/       # Regras de negócio (unicidade de nome, bloqueio de exclusão)
+│       ├── validators/     # Validação de campos obrigatórios, tamanhos e preço > 0
+│       ├── repositories/   # Consultas SQL parametrizadas (única camada que acessa o banco)
+│       ├── database/       # Pool de conexão PostgreSQL e script DDL (schema.sql)
+│       ├── middlewares/    # Tratamento centralizado de erros e rota 404
+│       └── errors/         # Classe AppError para erros conhecidos de negócio
 ├── api/
-│   └── index.js        # entrada da API na Vercel (repassa /api/* para o app Express)
+│   └── index.js            # Entrada serverless na Vercel que encaminha /api/* para o Express
 └── frontend/
     └── src/
-        ├── pages/          # telas
-        ├── components/     # pedaços de tela reaproveitados
-        ├── services/       # chamadas à API com axios
-        └── utils/          # validação, formatação de preço e hook de formulário
+        ├── pages/          # Telas da aplicação (ListaCategorias, FormCategoria, PratosDaCategoria)
+        ├── components/     # Componentes reutilizáveis (Cabecalho, Alerta, CampoFormulario, FormPrato, TabelaPratos)
+        ├── services/       # Cliente Axios e funções de consumo da API REST
+        └── utils/          # Hook useFormulario, formatador de moeda (BRL) e validações de formulário
 ```
 
-## Endpoints
+---
 
-| Método | Rota | O que faz |
-| --- | --- | --- |
-| GET | `/categorias` | Lista as categorias (com o total de pratos de cada uma) |
-| GET | `/categorias/:id` | Busca uma categoria |
-| POST | `/categorias` | Cria uma categoria |
-| PUT | `/categorias/:id` | Atualiza uma categoria |
-| DELETE | `/categorias/:id` | Exclui uma categoria (só se não tiver pratos) |
-| GET | `/categorias/:id/pratos` | Lista os pratos de uma categoria |
-| GET | `/pratos/:id` | Busca um prato |
-| POST | `/pratos` | Cria um prato |
-| PUT | `/pratos/:id` | Atualiza um prato |
-| DELETE | `/pratos/:id` | Exclui um prato |
+## Rotas da API REST
 
-Exemplo de corpo para criar um prato:
+| Entidade | Operação | Método e Rota | Status de Sucesso |
+| --- | --- | --- | --- |
+| Categoria | Listar todas (com contagem de pratos) | `GET /categorias` | `200 OK` |
+| Categoria | Buscar por ID | `GET /categorias/:id` | `200 OK` |
+| Categoria | Cadastrar nova categoria | `POST /categorias` | `201 Created` |
+| Categoria | Atualizar categoria | `PUT /categorias/:id` | `200 OK` |
+| Categoria | Excluir categoria (apenas sem pratos) | `DELETE /categorias/:id` | `204 No Content` |
+| Prato | Listar pratos de uma categoria | `GET /categorias/:id/pratos` | `200 OK` |
+| Prato | Buscar prato por ID | `GET /pratos/:id` | `200 OK` |
+| Prato | Cadastrar novo prato | `POST /pratos` | `201 Created` |
+| Prato | Atualizar prato | `PUT /pratos/:id` | `200 OK` |
+| Prato | Excluir prato | `DELETE /pratos/:id` | `204 No Content` |
+
+Exemplo de corpo JSON para cadastro/atualização de prato (`POST /pratos`):
 
 ```json
-{ "nome": "Frango grelhado", "descricao": "Arroz, feijão e salada", "preco": 18.5, "disponivel": true, "categoriaId": 1 }
+{
+  "nome": "Frango Grelhado Acebolado",
+  "descricao": "Filé de peito grelhado, arroz branco, feijão carioca, farofa e vinagrete.",
+  "preco": 18.50,
+  "disponivel": true,
+  "categoriaId": 1
+}
 ```
 
-## Regras validadas
+---
 
-- Campos obrigatórios: nome da categoria; nome, preço e categoria do prato.
-- Preço maior que zero.
-- Nome de categoria sem repetição (sem diferenciar maiúsculas e minúsculas).
-- Não deixa excluir uma categoria que ainda tem pratos.
+## Regras de negócio e validações implementadas
 
-As regras são checadas no formulário (resposta mais rápida) e de novo na API, que é quem garante. O banco também tem `CHECK (preco > 0)`, índice único em `LOWER(nome)` e chave estrangeira com `ON DELETE RESTRICT`.
+1. **Campos obrigatórios:** nome da categoria; nome, preço e categoria do prato (validados na interface e na API, retornando `400 Bad Request`).
+2. **Preço maior que zero:** rejeita valores nulos, zero ou negativos no formulário, no validador da API (`400 Bad Request`) e na restrição `CHECK (preco > 0)` do banco.
+3. **Nome de categoria sem repetição:** comparação *case-insensitive* no serviço (`409 Conflict`) e índice único `LOWER(nome)` no PostgreSQL.
+4. **Bloqueio de exclusão de categoria com pratos:** antes de excluir, o serviço verifica a contagem de pratos vinculados e retorna `409 Conflict` orientando o usuário, além da integridade referencial `ON DELETE RESTRICT` na chave estrangeira.
 
-## Como rodar localmente
+---
 
-Pré-requisito: Node.js 20 ou mais novo e um banco PostgreSQL (pode ser o do Supabase).
+## Como executar localmente
+
+Pré-requisitos: Node.js 20+ e PostgreSQL (ou variáveis configuradas no `.env`).
 
 ```bash
-# API
+# 1. Iniciar a API (porta 3001)
 cd backend
 npm install
-cp .env.example .env    # e coloque a DATABASE_URL do seu banco
-npm run dev             # http://localhost:3001
+cp .env.example .env
+npm run dev
 
-# Interface (em outro terminal)
+# 2. Iniciar a interface React (porta 3000, em outro terminal)
 cd frontend
 npm install
-npm run dev             # http://localhost:3000
+npm run dev
 ```
-
-Se o banco estiver vazio, as tabelas são criadas quando a API sobe (`backend/src/database/schema.sql`).
-
-## Publicação
-
-O projeto inteiro fica em um único projeto da Vercel, configurado pelo `vercel.json` da raiz:
-
-- o build gera o frontend em `frontend/dist`;
-- `api/index.js` vira uma função serverless que atende tudo que começa com `/api`;
-- em produção o frontend chama `/api` (arquivo `frontend/.env.production`), então não precisa de CORS.
-
-Variáveis de ambiente na Vercel: `DATABASE_URL` (connection string do Session pooler do Supabase) e `DB_SSL=true`.
-
-## Equipe
-
-- Nome completo, matrícula
-- Nome completo, matrícula
-- Nome completo, matrícula
-- Nome completo, matrícula
