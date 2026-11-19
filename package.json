@@ -1,7 +1,7 @@
 {
   "name": "sabor-de-casa",
   "private": true,
-  "description": "Cardápio digital da marmitaria Sabor de Casa — Trabalho final N695 (Unifor)",
+  "description": "Usado só no deploy da Vercel: instala as dependências da API (pasta api/) e gera o build do frontend",
   "scripts": {
     "build": "cd frontend && npm install && npm run build"
   },

@@ -1,7 +1,7 @@
 const AppError = require('../errors/AppError');
 const { textoVazio, textoMuitoLongo } = require('./regras');
 
-function validarCategoria(dados) {
+function validarCategoria(dados = {}) {
   const campos = {};
 
   if (textoVazio(dados.nome)) {

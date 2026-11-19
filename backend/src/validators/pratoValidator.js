@@ -1,7 +1,7 @@
 const AppError = require('../errors/AppError');
 const { textoVazio, textoMuitoLongo, precoInvalido, converterId } = require('./regras');
 
-function validarPrato(dados) {
+function validarPrato(dados = {}) {
   const campos = {};
 
   if (textoVazio(dados.nome)) {
