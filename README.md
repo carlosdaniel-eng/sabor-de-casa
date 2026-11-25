@@ -95,7 +95,8 @@ O projeto inteiro fica em um único projeto da Vercel, configurado pelo `vercel.
 
 - o build gera o frontend em `frontend/dist`;
 - `api/index.js` vira uma função serverless que atende tudo que começa com `/api`;
-- em produção o frontend chama `/api` (arquivo `frontend/.env.production`), então não precisa de CORS.
+- em produção o frontend chama `/api` (arquivo `frontend/.env.production`), então não precisa de CORS;
+- um cron da Vercel chama `GET /api/categorias` uma vez por dia (12h UTC). No plano gratuito o Supabase pausa o banco depois de alguns dias sem acesso, e essa leitura diária mantém o banco ativo.
 
 Variáveis de ambiente na Vercel: `DATABASE_URL` (connection string do Session pooler do Supabase) e `DB_SSL=true`.
 
